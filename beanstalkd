@@ -1,0 +1,49 @@
+#!/usr/bin/env php
+<?php
+
+require "vendor/autoload.php";
+
+$pheanstalk = new \Pheanstalk\Pheanstalk('localhost', 11300);
+
+$states = ['ready', 'reserved', 'urgent', 'delayed', 'buried'];
+$tubes = $pheanstalk->listTubes();
+sort($tubes);
+
+$graphTitle = 'Beanstalkd jobs';
+$graphVlabel = 'count';
+
+if ($argc > 1) {
+  if ($argv[1] === 'config') {
+
+    $configString = [];
+
+    foreach ($tubes as $tube) {
+      $configString[] = 'multigraph job_count_' . $tube;
+      $configString[] = 'graph_title ' . $graphTitle . ' (' . $tube . ')';
+      $configString[] = 'graph_category beanstalk';
+      $configString[] = 'graph_order ' . implode(' ', $states);
+      $configString[] = 'graph_vlabel ' . $graphVlabel;
+      foreach ($states as $state) {
+        $configString[] = $state . '.label ' . ucfirst($state);
+      }
+    }
+
+    echo implode("\n", $configString);
+    exit(0);
+  }
+} else {
+
+  $dataString = [];
+  foreach ($tubes as $tube) {
+    $stats = $pheanstalk->statsTube($tube);
+
+    $dataString[] = 'multigraph job_count_' . $tube;
+
+    foreach ($states as $state) {
+      $dataString[] = $state . '.value ' . $stats['current-jobs-' . $state];
+    }
+  }
+
+  echo implode("\n", $dataString);
+  exit(0);
+}
