@@ -13,7 +13,7 @@ Go to the [latest release page](https://github.com/alexsoft/munin-beanstalk/rele
 For example (phar file URL might be different):
 
 ```sh
-    wget https://github.com/alexsoft/munin-beanstalk/releases/download/v0.0.1/munin-beanstalk.phar
+    wget https://github.com/alexsoft/munin-beanstalk/releases/download/v1.0.0/munin-beanstalk.phar
     chmod a+x munin-beanstalk.phar
     sudo mv munin-beanstalk.phar /etc/munin/plugins/beanstalk
 ```
